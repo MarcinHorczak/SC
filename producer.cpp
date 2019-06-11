@@ -1,9 +1,10 @@
 #include <cstdlib>
 #include "header/queue.h"
+#include "header/producer.h"
 
 using namespace std;
 
-Producer::Producer(int arr_size, Queue mainQueue &): mainQueue(mainQueue) {
+Producer::Producer(int arr_size, Queue &mainQueue): _queue(mainQueue) {
     _arr_size = arr_size;
 }
 
@@ -14,12 +15,12 @@ void Producer::produceData() {
         table[i] = rand() % 1000;
     }
 
-    mainQueue.addToQueue(table);
+    _queue.addToQueue(table);
 }
 
 int Producer::numberOfProducedData() {
-    return mainQueue.mainQueue.size();
+    return _queue.mainQueue.size();
 }
 
-Queue mainQueue;
+Queue _queue;
 int _arr_size;

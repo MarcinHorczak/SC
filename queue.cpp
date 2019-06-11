@@ -28,3 +28,5 @@ bool Queue::isQueueFull() {
     else
         return false;
 }
+
+std::queue<int*> mainQueue;
