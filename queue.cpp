@@ -10,13 +10,13 @@ Queue::Queue(int length) {
 }
         
 void Queue::addToQueue(int *table) {
-    if (mainQueue.size() <= _length) {
+    if (mainQueue.size() < _length) {
         mainQueue.push(table);
     }
 }
 
 bool Queue::isQueueEmpty() {
-    if (mainQueue.empty())
+    if (mainQueue.size() == 0)
         return true;
     else
         return false;
