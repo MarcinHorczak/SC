@@ -1,6 +1,6 @@
 class Producer {
     public:
-        Producer(int arr_size, Queue& mainQueue);
+        Producer(int arr_size, Queue *mainQueue);
         void produceData();
         int numberOfProducedData();
 

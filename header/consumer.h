@@ -1,6 +1,6 @@
 class Consumer {
     public:
-        Consumer(int arr_size, Queue& mainQueue);
+        Consumer(int arr_size, Queue *mainQueue);
 
         void consumeData();
 

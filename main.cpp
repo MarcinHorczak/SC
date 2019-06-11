@@ -23,8 +23,8 @@ int main() {
     // result: 4
 
     Queue queue(MAX_NUM_OF_EL);
-    Producer producer(ARRSIZE, queue);
-    Consumer consumer(ARRSIZE, queue);
+    Producer producer(ARRSIZE, &queue);
+    Consumer consumer(ARRSIZE, &queue);
 
     boost::thread producer_thread([&] {
         int i = 0;

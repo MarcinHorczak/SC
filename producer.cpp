@@ -4,7 +4,8 @@
 
 using namespace std;
 
-Producer::Producer(int arr_size, Queue& mainQueue): _queue(mainQueue) {
+Producer::Producer(int arr_size, Queue *mainQueue) {
+    _queue = *mainQueue;
     _arr_size = arr_size;
 }
 

@@ -5,7 +5,8 @@
 using namespace std;
 std::mutex mtx;
 
-Consumer::Consumer(int arr_size, Queue& mainQueue): queue(mainQueue) {
+Consumer::Consumer(int arr_size, Queue *mainQueue) {
+    queue = *mainQueue;
     _arrsize = arr_size;
 }
 
