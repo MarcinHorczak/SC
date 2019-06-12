@@ -16,10 +16,14 @@ void Queue::addToQueue(int *table) {
 }
 
 bool Queue::isQueueEmpty() {
-    if (mainQueue.size() == 0)
+    if (mainQueue.empty())
         return true;
     else
         return false;
+}
+
+int Queue::queueSize() {
+    return mainQueue.size();
 }
 
 bool Queue::isQueueFull() {
@@ -28,5 +32,3 @@ bool Queue::isQueueFull() {
     else
         return false;
 }
-
-std::queue<int*> mainQueue;

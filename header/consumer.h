@@ -8,7 +8,7 @@ class Consumer {
     private:
         int* sortFunction(int *table);
         
-        Queue queue;
+        Queue* queue;
         int _sortedElements;
         int _arrsize;
 };

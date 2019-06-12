@@ -1,7 +1,6 @@
 #include "header/queue.h"
 #include "header/producer.h"
 #include "header/consumer.h"
-#include <queue>
 #include <cstdlib>
 #include <stdlib.h>
 #include <iostream>
@@ -22,19 +21,19 @@ int main() {
     // cout << boost::thread::hardware_concurrency() << endl;
     // result: 4
 
-    Queue queue(MAX_NUM_OF_EL);
-    Producer producer(ARRSIZE, &queue);
-    Consumer consumer(ARRSIZE, &queue);
+    Queue *queue = new Queue(MAX_NUM_OF_EL);
+    Producer producer(ARRSIZE, queue);
+    Consumer consumer(ARRSIZE, queue);
 
     boost::thread producer_thread([&] {
         int i = 0;
         while (i < NUMBER_OF_ELEMENTS) {
-            if (queue.isQueueFull()) {
-                cout << "Full" << endl;
+            if ((*queue).isQueueFull()) {
+                //cout << "Full" << endl;
                 boost::this_thread::yield();
             } else {
                 producer.produceData();
-                cout << "Produced! Queue state: " << producer.numberOfProducedData() << endl;
+                cout << "Produced! Queue state: " << producer.numberOfProducedData() << " " << (*queue).queueSize() << endl;
                 i++;
             }
         }
@@ -42,7 +41,7 @@ int main() {
     boost::thread consume_data([&] {
         int i = 0;
         while (i < NUMBER_OF_ELEMENTS) {
-            if (queue.isQueueEmpty()) {
+            if ((*queue).isQueueEmpty()) {
                 boost::this_thread::yield();
             } else {
                 consumer.consumeData();

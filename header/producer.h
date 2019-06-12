@@ -5,6 +5,7 @@ class Producer {
         int numberOfProducedData();
 
     private:
-        Queue _queue;
+        Queue *_queue;
         int _arr_size;
+        
 };

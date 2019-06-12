@@ -5,17 +5,17 @@
 using namespace std;
 std::mutex mtx;
 
-Consumer::Consumer(int arr_size, Queue *mainQueue) {
-    queue = *mainQueue;
+Consumer::Consumer(int arr_size, Queue *mainQueue){
+    queue = mainQueue;
     _arrsize = arr_size;
 }
 
 void Consumer::consumeData() {
     mtx.lock();
-    int *frontElement = queue.mainQueue.front();
+    int *frontElement = (*queue).mainQueue.front();
     sortFunction(frontElement);
     delete frontElement;
-    queue.mainQueue.pop();
+    (*queue).mainQueue.pop();
     mtx.unlock();
 }
 
@@ -41,7 +41,4 @@ int* Consumer::sortFunction(int *table) {
 
     return table;
 }
-        
-Queue queue;
-int _sortedElements = 0;
-int _arrsize;
+
