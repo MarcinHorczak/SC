@@ -9,6 +9,6 @@ class Consumer {
         int* sortFunction(int *table);
         
         Queue* queue;
-        int _sortedElements;
+        int _sortedElements = 0;
         int _arrsize;
 };

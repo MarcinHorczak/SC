@@ -12,5 +12,4 @@ class Queue {
 
         std::queue<int*> mainQueue;
         int _length;
-        
 };
