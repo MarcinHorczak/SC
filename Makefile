@@ -1,5 +1,5 @@
 all: queue.o producer.o consumer.o main.o
-	g++ bin/queue.o bin/producer.o bin/consumer.o bin/main.o -o a.out -pthread -lboost_system -lboost_thread && ./a.out
+	g++ bin/queue.o bin/producer.o bin/consumer.o bin/main.o -o a.out -pthread -lboost_system -lboost_thread -w && ./a.out
 
 main.o: main.cpp
 	g++ -c main.cpp -o bin/main.o 

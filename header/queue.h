@@ -1,4 +1,4 @@
-#include <queue>
+#include <deque>
 
 class Queue {
     public:
@@ -8,8 +8,6 @@ class Queue {
         int queueSize();
         bool isQueueEmpty();
         bool isQueueFull();
-
-
-        std::queue<int*> mainQueue;
+        std::deque<int*> mainQueue;
         int _length;
 };

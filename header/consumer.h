@@ -1,3 +1,5 @@
+#include <boost/ptr_container/ptr_vector.hpp>
+
 class Consumer {
     public:
         Consumer(int arr_size, Queue *mainQueue);
@@ -11,4 +13,5 @@ class Consumer {
         Queue* queue;
         int _sortedElements = 0;
         int _arrsize;
+        boost::ptr_vector<int> threads_vector;
 };

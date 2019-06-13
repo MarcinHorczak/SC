@@ -1,4 +1,6 @@
 #include <mutex>
+#include <iostream>
+#include <boost/ptr_container/ptr_deque.hpp>
 #include "header/queue.h"
 #include "header/consumer.h"
 
@@ -12,10 +14,15 @@ Consumer::Consumer(int arr_size, Queue *mainQueue){
 
 void Consumer::consumeData() {
     mtx.lock();
-    int *frontElement = (*queue).mainQueue.front();
-    sortFunction(frontElement);
-    delete frontElement;
-    (*queue).mainQueue.pop();
+    // int *p = queue -> mainQueue;
+    // threads_vector.push_back(p);
+    // std::cout << "TEST" << queue -> mainQueue.size() << std::endl;
+    if (!queue -> isQueueEmpty()) {
+        int *frontElement = queue -> mainQueue.front();
+        sortFunction(frontElement);
+        free(frontElement);
+        queue -> mainQueue.pop_front();
+    }
     mtx.unlock();
 }
 
@@ -26,14 +33,14 @@ int Consumer::getNumberOfSortedElements() {
 int* Consumer::sortFunction(int *table) {
     int temp;
     for(int i = 0; i < _arrsize; i++) {
-        for(int j = i+1; j < _arrsize; j++)
+        for(int j = i+1; j < _arrsize/10; j++)
         {
-            if(table[j] < table[i])
-            {
-                temp = table[i];
-                table[i] = table[j];
-                table[j] = temp;
-            }
+            // if(table[j] < table[i])
+            // {
+            //     temp = table[i];
+            //     table[i] = table[j];
+            //     table[j] = temp;
+            // }
         }
     }
         

@@ -1,5 +1,4 @@
 #include "header/queue.h"
-#include <queue>
 
 using namespace std;
 
@@ -11,7 +10,7 @@ Queue::Queue(int length) {
         
 void Queue::addToQueue(int *table) {
     if (mainQueue.size() < _length) {
-        mainQueue.push(table);
+        mainQueue.push_back(table);
     }
 }
 
