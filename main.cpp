@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <stdlib.h>
 #include <iostream>
+#include <mutex>
 #include <boost/thread.hpp>
 
 using namespace std;
@@ -12,7 +13,8 @@ using namespace std;
 int ARRSIZE = 100000;
 int MAX_NUM_OF_EL = 10;
 int NUMBER_OF_ELEMENTS = 20;
-int NUMBER_OF_THREADS = 2;
+int NUMBER_OF_THREADS = 1;
+std::mutex *mtx = new mutex();
 
 int main() {
     vector<boost::thread> consume_thread;
@@ -21,8 +23,8 @@ int main() {
     // cout << boost::thread::hardware_concurrency() << endl;
 
     Queue *queue = new Queue(MAX_NUM_OF_EL);
-    Producer producer(ARRSIZE, NUMBER_OF_ELEMENTS, queue);
-    Consumer consumer(ARRSIZE, queue);
+    Producer producer(ARRSIZE, NUMBER_OF_ELEMENTS, queue, mtx);
+    Consumer consumer(ARRSIZE, queue, mtx);
 
     boost::thread producer_thread([&] {
         int i = 0;
@@ -31,7 +33,6 @@ int main() {
                 boost::this_thread::yield();
             } else {
                 producer.produceData();
-                cout << "Produced: " << producer.numberOfProducedData() << endl;
                 i++;
             }
         }
@@ -46,7 +47,6 @@ int main() {
                             boost::this_thread::yield();
                         } else {
                             consumer.consumeData();
-                            cout << "Consumed! Queue state: " << consumer.getNumberOfSortedElements() << endl;
                         }
                     }
                 }

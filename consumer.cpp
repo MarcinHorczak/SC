@@ -1,29 +1,42 @@
-#include <mutex>
 #include <iostream>
 #include <boost/ptr_container/ptr_deque.hpp>
+#include <mutex>
 #include "header/queue.h"
 #include "header/consumer.h"
 
 using namespace std;
-std::mutex mtx;
 
-Consumer::Consumer(int arr_size, Queue *mainQueue){
+Consumer::Consumer(int arr_size, Queue *mainQueue, mutex *mtx){
     queue = mainQueue;
     _arrsize = arr_size;
+    _mtx = mtx;
 }
 
 void Consumer::consumeData() {
-    mtx.lock();
-    // int *p = queue -> mainQueue;
-    // threads_vector.push_back(p);
-    // std::cout << "TEST" << queue -> mainQueue.size() << std::endl;
+    _mtx -> lock();
     if (!queue -> isQueueEmpty()) {
-        int *frontElement = queue -> mainQueue.front();
-        sortFunction(frontElement);
-        free(frontElement);
-        queue -> mainQueue.pop_front();
+        Bufor bufor;
+        bufor.isSorted = false;
+        if (queue -> mainQueue.size() > _working_threads) {
+            bufor.threads = queue -> mainQueue.at(_working_threads);
+            threads_vector.push_back(bufor);
+            _working_threads++;
+        }
     }
-    mtx.unlock();
+    _mtx -> unlock();
+
+    for (int i = 0; i < threads_vector.size(); i++) {
+        if (!threads_vector.at(i).isSorted) {
+            _mtx -> lock();
+            threads_vector.at(i).isSorted = true;
+            _mtx -> unlock();
+            sortFunction(threads_vector.at(i).threads);
+            queue -> mainQueue.pop_front();
+            threads_vector.pop_front();
+            _working_threads--;
+            cout << "Consumed! Queue state: " << _sortedElements << endl;
+        }
+    }
 }
 
 int Consumer::getNumberOfSortedElements() {
@@ -33,14 +46,14 @@ int Consumer::getNumberOfSortedElements() {
 int* Consumer::sortFunction(int *table) {
     int temp;
     for(int i = 0; i < _arrsize; i++) {
-        for(int j = i+1; j < _arrsize/10; j++)
+        for(int j = i+1; j < _arrsize/2; j++)
         {
-            // if(table[j] < table[i])
-            // {
-            //     temp = table[i];
-            //     table[i] = table[j];
-            //     table[j] = temp;
-            // }
+            if(table[j] < table[i])
+            {
+                temp = table[i];
+                table[i] = table[j];
+                table[j] = temp;
+            }
         }
     }
         
