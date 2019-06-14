@@ -1,3 +1,5 @@
 .vscode/*
 bin
 a.out
+.bin
+.*o

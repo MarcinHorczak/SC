@@ -15,9 +15,9 @@ Consumer::Consumer(int arr_size, Queue *mainQueue, mutex *mtx){
 void Consumer::consumeData() {
     _mtx -> lock();
     if (!queue -> isQueueEmpty()) {
-        Bufor bufor;
-        bufor.isSorted = false;
         if (queue -> mainQueue.size() > _working_threads) {
+            Bufor bufor;
+            bufor.isSorted = false;
             bufor.threads = queue -> mainQueue.at(_working_threads);
             threads_vector.push_back(bufor);
             _working_threads++;
@@ -46,7 +46,7 @@ int Consumer::getNumberOfSortedElements() {
 int* Consumer::sortFunction(int *table) {
     int temp;
     for(int i = 0; i < _arrsize; i++) {
-        for(int j = i+1; j < _arrsize/2; j++)
+        for(int j = i+1; j < _arrsize/5; j++)
         {
             if(table[j] < table[i])
             {
