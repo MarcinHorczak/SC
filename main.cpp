@@ -67,7 +67,7 @@ int main() {
     cout << "Number of sorted elements: " << consumer.getNumberOfSortedElements() << endl;
 
     auto end = chrono::system_clock::now();
-    auto elapsed = chrono::duration_cast<chrono::seconds>(end - start);
+    auto elapsed = chrono::duration_cast<chrono::milliseconds>(end - start);
     cout << "Time: " << elapsed.count() << endl;
 
     delete(queue);
