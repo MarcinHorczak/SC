@@ -7,8 +7,8 @@
 using namespace std;
 
 int ARRSIZE = 100000;
-int MAX_NUM_OF_EL = 10;
-int NUMBER_OF_ELEMENTS = 20;
+int MAX_NUM_OF_EL = 5;
+int NUMBER_OF_ELEMENTS = 10;
 int NUMBER_OF_THREADS = 4;
 
 void sortFunction(int *table) {
@@ -30,48 +30,68 @@ int main(int argc, char *argv[]) {
     boost::mpi::environment env{argc, argv};
     boost::mpi::communicator world;
     
+    /////////////////////
     // 0 - QUEUE
+    /////////////////////
     if (world.rank() == 0) {
         std::deque<int*> mainQueue;
         int* table = new int[ARRSIZE];
         bool* consumer_ready = new bool[world.size() - 2];
         bool end = false;
+        int index;
+        int iter = 0;
+        int sortedElements = 0;
+        int producedElements = 0;
+        double t1, t2; 
+        boost::mpi::request req[40];
+        req[0] = world.irecv(boost::mpi::any_source, 20, index);
 
         for (int i = 0; i < world.size() - 2; i++) {
             consumer_ready[i] = false;
         }
 
-        while (!end || mainQueue.size() != 0) {
-            if (mainQueue.size() < MAX_NUM_OF_EL) {
+        t1 = MPI_Wtime(); 
+        while (!end || mainQueue.size() > 0) {
+            if (mainQueue.size() < MAX_NUM_OF_EL && producedElements < NUMBER_OF_ELEMENTS) {
                 world.recv(1, 10, table, ARRSIZE);
                 world.irecv(1, 100, end);
                 mainQueue.push_back(table);
+                producedElements++;
             }
-            if (!mainQueue.empty()) {
-                int index;
-                world.recv(boost::mpi::any_source, 20, index);
-                world.send(index + 2, 21, false);
-                consumer_ready[index] = true;
 
+            if (!mainQueue.empty()) {
+                if (req[iter].test()) {
+                    consumer_ready[index] = true;
+                    iter++;
+                    req[iter] = world.irecv(boost::mpi::any_source, 20, index);
+                }
                 for (int i = 0; i < world.size() - 2; i++) {
                     if (consumer_ready[i]) {
                         consumer_ready[i] = false;
+                        world.send(i + 2, 21, false);
                         world.send(i + 2, 30, mainQueue.front(), ARRSIZE);
                         mainQueue.pop_front();
-                        cout << "Consumed element: " << mainQueue.size() << endl;
+                        sortedElements++;
+                        cout << "Consumed element: " << sortedElements << " " << mainQueue.size() << endl;
                     }
                 }
             }
         }
-        int index;
 
-        for (int i = 0; i < world.size() - 2; i++) {
-            world.recv(i + 2, 20, index);
-            world.send(i + 2, 21, true);
+        t2 = MPI_Wtime(); 
+        printf( "Elapsed time is %f\n", t2 - t1 );
+
+        for (int i = 2; i < world.size(); i++) {
+            world.irecv(i, 20, index);
+            world.isend(i, 21, true);
         }
+
+        cout << "QUEUE END " << endl;
     }
 
+    /////////////////////
     // 1 - PRODUCER
+    /////////////////////
     if (world.rank() == 1) {
         for (int i = 0; i < NUMBER_OF_ELEMENTS; i++) {
             int table[ARRSIZE];
@@ -79,13 +99,15 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < ARRSIZE; i++) {
                 table[i] = rand() % 1000;
             }
-            world.send(0, 10, table, ARRSIZE);
             cout << "Produced: " << i + 1 << endl;
+            world.send(0, 10, table, ARRSIZE);
         }
         world.send(0, 100, true);
     }
 
+    /////////////////////
     // 2+ - CONSUMERS
+    /////////////////////
     if (world.rank() >= 2) {
         int* table = new int[ARRSIZE];
         bool finish = false;
@@ -98,6 +120,8 @@ int main(int argc, char *argv[]) {
                 sortFunction(table);
             }
         }
+
+        cout << "CONSUMER END: " << world.rank() << endl;
     }
 
     return 0;
