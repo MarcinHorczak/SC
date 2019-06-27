@@ -1,5 +1,5 @@
 all: main.o
-	mpiCC main.o -o a.out -lboost_mpi -lboost_serialization -w && mpiexec -n 3 ./a.out
+	mpiCC main.o -o a.out -lboost_mpi -lboost_serialization -w && mpiexec -n 15 ./a.out
 
 main.o: main.cpp
 	mpiCC -c main.cpp -o main.o 

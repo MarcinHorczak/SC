@@ -7,9 +7,8 @@
 using namespace std;
 
 int ARRSIZE = 100000;
-int MAX_NUM_OF_EL = 5;
-int NUMBER_OF_ELEMENTS = 10;
-int NUMBER_OF_THREADS = 4;
+int MAX_NUM_OF_EL = 10;
+int NUMBER_OF_ELEMENTS = 20;
 
 void sortFunction(int *table) {
     int temp;
@@ -29,10 +28,12 @@ void sortFunction(int *table) {
 int main(int argc, char *argv[]) {
     boost::mpi::environment env{argc, argv};
     boost::mpi::communicator world;
+    boost::mpi::timer::time_is_global;
     
     /////////////////////
     // 0 - QUEUE
     /////////////////////
+    double t1; 
     if (world.rank() == 0) {
         std::deque<int*> mainQueue;
         int* table = new int[ARRSIZE];
@@ -42,8 +43,7 @@ int main(int argc, char *argv[]) {
         int iter = 0;
         int sortedElements = 0;
         int producedElements = 0;
-        double t1, t2; 
-        boost::mpi::request req[40];
+        boost::mpi::request req[2 * NUMBER_OF_ELEMENTS];
         req[0] = world.irecv(boost::mpi::any_source, 20, index);
 
         for (int i = 0; i < world.size() - 2; i++) {
@@ -78,13 +78,16 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        t2 = MPI_Wtime(); 
-        printf( "Elapsed time is %f\n", t2 - t1 );
+        boost::mpi::request req1[world.size() + 2];
+        boost::mpi::request req2[world.size() + 2];
 
         for (int i = 2; i < world.size(); i++) {
-            world.irecv(i, 20, index);
-            world.isend(i, 21, true);
+            req1[i - 2] = world.irecv(i, 20, index);
+            req2[i - 2] = world.isend(i, 21, true);
         }
+
+        // boost::mpi::wait_all(req1, req1 + world.size() - 7);
+        // boost::mpi::wait_all(req2, req2 + world.size() - 7);
 
         cout << "QUEUE END " << endl;
     }
@@ -122,6 +125,14 @@ int main(int argc, char *argv[]) {
         }
 
         cout << "CONSUMER END: " << world.rank() << endl;
+    }
+
+    world.barrier();
+
+    if (world.rank() == 0) {
+        double t2; 
+        t2 = MPI_Wtime(); 
+        printf( "Elapsed time is %f\n", t2 - t1 );
     }
 
     return 0;
